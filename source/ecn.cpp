@@ -192,3 +192,52 @@ BOOL is_on_curve(const Big& a)
 
 #endif
 #endif
+    ostringstream& operator<<(ostringstream& os, const ECn& s)
+    {
+      // write out individual members of s with an end of line between each one
+      Big xg1, yg1; 
+      s.get(xg1, yg1); 
+      os <<= xg1;os << '\n';
+      os <<= yg1;os << '\n';
+      // cout << os.str() << endl;
+      return os;
+    }
+    istringstream& operator>>(istringstream& is, ECn& s)
+    {
+      // read in individual members of s
+      Big xg1, yg1; 
+      is >>= xg1; is >>= yg1;
+      s.set(xg1, yg1);
+      return is;
+    }
+    ostringstream& operator<<=(ostringstream& os, const ECn* s)
+    {
+      // write out individual members of s with an end of line between each one
+      Big x,y;
+      for (int i=0;i<256;i++)
+      {
+        s[i].get(x,y);
+        os <<= x; os << '\n';
+        os <<= y; os << '\n';
+        // std::cout << "i:" << i << ", " << x << " :: " << y << std::endl;
+      }
+      // std::cout << "ostringstream worked.." << endl;
+      return os;
+    }
+    istringstream& operator>>=(istringstream& is, ECn*& s)
+    {
+      // read in individual members of s
+      // cout << "s:" <<  is.str() << endl;
+      Big x, y; 
+      s=new ECn[256];
+      for (int i=0;i<256;i++)
+      {
+        is >>= x; is >>= y;
+        // cout << "i:" << i << ", x: " << x << ", y: " << y << "\n" <<  endl;
+        s[i].set(x,y);
+      }
+      // cout << "s0::" << s[0] << endl;
+      // cout << "s1::" << s[1] << endl;
+      // cout << "s2::" << s[2] << endl;
+      return is;
+    }

@@ -216,4 +216,89 @@ ECn2 mul(int n,ECn2* P,const Big* b)
 #endif
 
 #endif
+ostringstream& operator<<(ostringstream& os, const ECn2& s)
+{
+      // write out individual members of s with an end of line between each one
 
+    ZZn2 x,y;
+    if (!s.iszero())
+        // os << "(Infinity)";
+    // else
+    {
+        s.get(x,y);
+        os << x << "\n";
+        os << y << "\n";
+    }
+    return os;
+
+
+}
+istringstream& operator>>(istringstream& is, ECn2& s)
+{
+
+
+      // read in individual members of s
+      ZZn2 x, y; 
+      is >> x >> y;
+      s.set(x, y);
+
+      return is;
+}
+ostringstream& operator<<=(ostringstream& os, const ECn2* es)
+{
+      // write out individual members of s with an end of line between each one
+    // ZZn4 a,b;
+    ZZn2 f,s;
+    Big x,y;
+
+    // cout << "Size of es: " << sizeof(es) << endl;
+
+    for (int i=0;i<256;i++)
+    {
+        es[i].get(f,s);
+        // a.get(f,s);
+        f.get(x,y);
+        os <<= x; os << '\n';
+        os <<= y; os << '\n';
+        s.get(x,y);
+        os <<= x; os << '\n';
+        os <<= y; os << '\n';
+        // b.get(f,s);
+        // f.get(x,y);
+        // os <<= x; os << '\n';
+        // os <<= y; os << '\n';
+        // s.get(x,y);
+        // os <<= x; os << '\n';
+        // os <<= y; os << '\n';
+
+    }
+
+      return os;
+}
+istringstream& operator>>=(istringstream& is, ECn2*& es)
+{
+
+      // ZZn4 a,b;
+      ZZn2 f,s;
+      Big x,y;
+
+      es=new ECn2[256];
+      for (int i=0;i<256;i++)
+      {
+        is >>= x; is >>= y;
+        f.set(x,y);
+        is >>= x; is >>= y;
+        s.set(x,y);
+        // a.set(f,s);
+        // is >>= x; is >>= y;
+        // f.set(x,y);
+        // is >>= x; is >>= y;
+        // s.set(x,y);
+        // b.set(f,s);
+        es[i].set(f,s);
+
+      }
+       
+      return is;
+
+}

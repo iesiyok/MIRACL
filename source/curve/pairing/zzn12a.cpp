@@ -379,3 +379,48 @@ ostream& operator<<(ostream& s,const ZZn12& xx)
 
 #endif
 
+ostringstream& operator<<(ostringstream& os, const ZZn12& s)
+    {
+      // write out individual members of s with an end of line between each one
+        ZZn4 x, y, z;
+        s.get(x, y, z);
+        os << x << "\n";
+        os << y << "\n";
+        os << z << "\n";
+
+        return os;
+
+    }
+    istringstream& operator>>(istringstream& is, ZZn12& s)
+    {
+      // read in individual members of s
+        ZZn4 x, y, z;
+        is >> x >> y >> z;
+        s.set(x, y, z);
+
+        return is;
+    }
+    ostringstream& operator<<=(ostringstream& os, const ZZn12* s)
+    {
+      // write out individual members of s with an end of line between each one
+
+        ZZn4 x, y, z;
+        for (int i=0;i<256;i++){
+            s[i].get(x, y, z);
+            os << x << "\n";
+            os << y << "\n";
+            os << z << "\n";
+        }
+        return os;
+    }
+    istringstream& operator>>=(istringstream& is, ZZn12*& s)
+    {
+      // read in individual members of s
+        ZZn4 x, y, z;
+        s = new ZZn12[256];
+        for (int i=0;i<256;i++){
+            is >> x >> y >> z;
+            s[i].set(x, y, z);
+        }
+        return is;
+    }

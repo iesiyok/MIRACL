@@ -48,7 +48,13 @@ the CertiVox MIRACL Crypto SDK with a closed source product.               *
 #ifndef PAIRING_3_H
 #define PAIRING_3_H
 
-#include "ecn.h"	// G1
+#include "ecn.h"
+
+#include <fstream>
+#include <iostream>
+#include <sstream> 
+
+using namespace std;
 
 // K=2 Cocks-Pinch curve
 #ifdef MR_PAIRING_CP
@@ -118,26 +124,96 @@ public:
 	ECn g;
 
 	ECn *mtable;   // pointer to values precomputed for multiplication
- 
 	int mtbits;
-    G1()   {mtable=NULL; mtbits=0;}
-	G1(const G1& w) {mtable=NULL; mtbits=0; g=w.g;}
+	ECn *m_store=NULL;
+    
+	G1()   {mtable=NULL; mtbits=0; m_store = NULL;}
+	G1(const G1& w) {
+
+		if(w.m_store != NULL){
+
+			mtable=w.m_store; 
+			m_store=w.m_store;
+			mtbits=w.mtbits;
+
+		}else{
+			
+		 	mtable=NULL; 
+		 	m_store=NULL;
+			mtbits=0;
+		
+		}
+		g=w.g;
+	}
 
 	G1& operator=(const G1& w) 
 	{
-		if (mtable==NULL) g=w.g; 
-		else read_only_error(); 
+		
+		if(w.m_store != NULL){
+
+			mtable=w.m_store; 
+			m_store=w.m_store;
+			mtbits=w.mtbits;
+		}else{
+
+			mtable = NULL;
+			m_store=NULL;
+			mtbits = 0;
+		}
+
+		g=w.g;
 		return *this;
+		
 	} 
+	G1& operator<<=(const G1& w) 
+	{
+		
+		if(w.m_store != NULL){
+
+			mtable=w.m_store; 
+			m_store=w.m_store;
+			mtbits=w.mtbits;
+			
+
+		}else{
+			
+		 	mtable=NULL; 
+		 	m_store=NULL;
+			mtbits=0;
+		
+		}
+
+		g=w.g;
+		return *this;
+		
+	} 
+	void store_precomp( char* s, int bits){
+		istringstream is(s);
+		is >>= m_store;
+		mtbits = bits;
+
+
+	}
 	int spill(char *&);
 	void restore(char *);
+
 	friend G1 operator-(const G1&);
 	friend G1 operator+(const G1&,const G1&);
 	friend BOOL operator==(const G1& x,const G1& y)
       {if (x.g==y.g) return TRUE; else return FALSE; }
 	friend BOOL operator!=(const G1& x,const G1& y)
       {if (x.g!=y.g) return TRUE; else return FALSE; }
-	~G1()  {if (mtable!=NULL) {delete [] mtable; mtable=NULL;}}
+    friend ostringstream& operator<<(ostringstream& os, const G1& s)
+	{
+		os << s.g;
+		os << '\n';
+		return os;
+	}
+	friend istringstream& operator>>(istringstream& is, G1& s){
+		is >> s.g;
+		return is;
+	}
+	~G1()  {}
 };
 
 //
@@ -154,14 +230,88 @@ public:
 	G2_TYPE *mtable; // pointer to values precomputed for multiplication
 	int mtbits;
 
-    G2()   {ptable=NULL; mtable=NULL; mtbits=0;}
-	G2(const G2& w) {ptable=NULL; mtable=NULL; mtbits=0; g=w.g;}
+	G2_TYPE *m_store=NULL;
+	G2_SUBTYPE *p_store=NULL;
+
+	G2()   {ptable=NULL; mtable=NULL; mtbits=0; m_store = NULL; p_store = NULL; /*cout << "G2 constructor " << this << endl;*/}
+	G2(const G2& w) {
+
+		if(w.m_store != NULL){
+			mtable=w.m_store;
+			m_store=w.m_store;
+			mtbits=w.mtbits;  
+		}else{
+			mtable=NULL;
+			m_store=NULL;
+			mtbits=0; 
+		}
+		if(w.p_store != NULL){
+			ptable=w.p_store; 
+			p_store=w.p_store;
+		}else{
+			ptable = NULL;
+			p_store=NULL;
+		}
+		g=w.g;
+		
+	}
 	G2& operator=(const G2& w) 
 	{ 
-		if (ptable==NULL && mtable==NULL)	g=w.g; 
-		else read_only_error();
+		
+		if(w.m_store != NULL){
+			mtable=w.m_store;
+			m_store=w.m_store;
+			mtbits=w.mtbits;  
+		}else{
+			mtable=NULL;
+			m_store=NULL;
+			mtbits=0;
+		}
+		if(w.p_store != NULL){
+			ptable=w.p_store;
+			p_store=w.p_store; 
+		}else{
+			ptable=NULL;
+			p_store=NULL;
+		}
+
+		g=w.g;
 		return *this; 
 	} 
+	G2& operator<<=(const G2& w) 
+	{ 
+		
+		if(w.m_store != NULL){
+			mtable=w.m_store;
+			m_store=w.m_store;
+			mtbits=w.mtbits;  
+		}else{
+			mtable=NULL;
+			m_store=NULL;
+			mtbits=0; 
+		}
+		if(w.p_store != NULL){
+			ptable=w.p_store; 
+			p_store=w.p_store;
+		}else{
+			ptable = NULL;
+			p_store=NULL;
+		}
+		g=w.g;
+		return *this; 
+	} 
+
+	void store_precomp( char* s, int bits ){
+		istringstream is(s);
+		is >>= m_store;
+		mtbits = bits;
+		
+	}
+	void store_pairing_comp( char* s){
+		istringstream p_is(s);
+		p_is >>= p_store;
+	}
+
 	int spill(char *&);
 	void restore(char *);
 
@@ -172,8 +322,18 @@ public:
 	friend BOOL operator!=(G2& x,G2& y)
       {if (x.g!=y.g) return TRUE; else return FALSE; }
 
-	~G2() {if (ptable!=NULL) {delete [] ptable; ptable=NULL;}
-	       if (mtable!=NULL) {delete [] mtable; mtable=NULL;}}
+    friend ostringstream& operator<<(ostringstream& os, const G2& s)
+	{
+		os << s.g;
+		os << '\n';
+		return os;
+	}
+	friend istringstream& operator>>(istringstream& is, G2& s){
+		is >> s.g;
+		return is;
+	}
+
+	~G2() {}
 };
 
 class GT
@@ -184,25 +344,82 @@ public:
 	GT_TYPE *etable;
 	int etbits;
 
-	GT() {etable=NULL; etbits=0;}
-	GT(const GT& w) {etable=NULL; etbits=0; g=w.g;}
-	GT(int d) {etable=NULL; etbits=0; g=d;}
+	GT_TYPE *e_store=NULL;
+
+	GT() {etable=NULL; etbits=0; e_store = NULL;}
+	GT(const GT& w) {
+		
+		if(w.e_store != NULL){
+			etable=w.e_store; 
+			etbits=w.etbits; 
+			e_store=w.e_store;
+		}else{
+			etable = NULL;
+			e_store = NULL;
+			etbits = 0;
+		}
+		g=w.g;
+		
+	}
+	GT(int d) {etable=NULL; etbits=0; g=d; e_store = NULL;}
 
 	GT& operator=(const GT& w)  
 	{
-		if (etable==NULL) g=w.g; 
-		else read_only_error();
+		
+		if(w.e_store != NULL){
+			etable=w.e_store; 
+			e_store=w.e_store; 
+			etbits=w.etbits; 
+		}else{
+			etable = NULL;
+			e_store=NULL;
+			etbits = 0;
+		}
+		
+		g=w.g;
 		return *this;
 	} 
+	GT& operator<<=(const GT& w)  
+	{
+		
+		if(w.e_store != NULL){
+			etable=w.e_store; 
+			etbits=w.etbits; 
+			e_store=w.e_store;
+		}else{
+			etable = NULL;
+			e_store = NULL;
+			etbits = 0;
+		}
+		g=w.g;
+		return *this;
+	} 
+	void store_precomp(char* s, int bits){
+		istringstream is(s);
+		is >>= e_store;
+		etbits = bits;
+	}
+
 	int spill(char *&);
 	void restore(char *);
+
 	friend GT operator*(const GT&,const GT&);
 	friend GT operator/(const GT&,const GT&);
 	friend BOOL operator==(const GT& x,const GT& y)
       {if (x.g==y.g) return TRUE; else return FALSE; }
 	friend BOOL operator!=(const GT& x,const GT& y)
       {if (x.g!=y.g) return TRUE; else return FALSE; }
-	~GT() {if (etable!=NULL) {delete [] etable; etable=NULL;}}
+    friend ostringstream& operator<<(ostringstream& os, const GT& s)
+	{
+		os << s.g;
+		os << '\n';
+		return os;
+	}
+	friend istringstream& operator>>(istringstream& is, GT& s){
+		is >> s.g;
+		return is;
+	}
+	~GT() {}
 };
 
 // pairing friendly curve class

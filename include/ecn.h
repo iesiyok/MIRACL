@@ -53,7 +53,10 @@ the CertiVox MIRACL Crypto SDK with a closed source product.               *
 #define ECN_H
 
 #include <cstring>
+#include <sstream>
 #include "big.h"
+
+using namespace std;
 
 #ifdef ZZNS
 #define MR_INIT_ECN memset(mem,0,mr_ecp_reserve(1,ZZNS)); p=(epoint *)epoint_init_mem_variable(mem,0,ZZNS); 
@@ -146,6 +149,11 @@ public:
     friend ostream& operator<<(ostream&,const ECn&);
 
 #endif
+    
+    friend ostringstream& operator<<(ostringstream&, const ECn&  );
+    friend istringstream& operator>>(istringstream& , ECn& );
+    friend ostringstream& operator<<=(ostringstream& ,const ECn* );
+    friend istringstream& operator>>=(istringstream& , ECn*& );
 
     ~ECn() {
 #ifndef ZZNS

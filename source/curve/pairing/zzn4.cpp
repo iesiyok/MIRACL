@@ -480,3 +480,77 @@ ostream& operator<<(ostream& s,const ZZn4& xx)
 
 #endif
 
+ostringstream& operator<<(ostringstream& os,const ZZn4& z)
+{
+
+    ZZn2 f,s;
+    Big x,y;
+    
+    // ZZn2 x,y;
+    z.get(f, s);
+    f.get(x,y);
+    os <<= x; os << "\n";
+    // os << "\n";
+    os <<= y; os << "\n";
+    s.get(x,y);
+    os <<= x; os << "\n";
+    os <<= y; os << "\n";
+
+    return os;    
+}
+istringstream& operator>>(istringstream& is, ZZn4& z)
+{
+
+      
+      ZZn2 f,s;
+      Big x,y;
+
+      is >>= x; is >>= y;
+      f.set(x, y);
+      is >>= x; is >>= y;
+      s.set(x, y);
+      z.set(f, s);
+
+      return is;
+
+}
+ostringstream& operator<<=(ostringstream& os, const ZZn4* es)
+{
+      // write out individual members of s with an end of line between each one
+    
+    ZZn2 a,b;
+    Big x,y;
+
+    for (int i=0;i<132;i++)
+    {
+        es[i].get(a,b);
+        a.get(x,y);
+        os <<= x; os << "\n";
+        os <<= y; os << "\n";
+        b.get(x,y);
+        os <<= x; os << "\n";
+        os <<= y; os << "\n";
+
+    }
+
+      return os;
+}
+istringstream& operator>>=(istringstream& is, ZZn4*& es)
+{
+      ZZn2 a,b;
+      Big x,y;
+
+      es=new ZZn4[132];
+      for (int i=0;i<132;i++)
+      {
+        is >>= x; is >>= y;
+        a.set(x,y);
+        is >>= x; is >>= y;
+        b.set(x,y);
+        es[i].set(a,b);
+
+      }
+       
+      return is;
+
+}

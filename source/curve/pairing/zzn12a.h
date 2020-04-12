@@ -154,6 +154,11 @@ public:
     friend ostream& operator<<(ostream&,const ZZn12&);
 #endif
 
+    friend ostringstream& operator<<(ostringstream&,const ZZn12&);
+    friend istringstream& operator>>(istringstream&, ZZn12&);
+    friend ostringstream& operator<<=(ostringstream& ,const ZZn12* );
+    friend istringstream& operator>>=(istringstream& , ZZn12*& );
+
     ~ZZn12()  {}
 };
 #ifndef MR_NO_RAND

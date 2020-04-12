@@ -162,6 +162,11 @@ public:
 
     zzn2* getzzn2(void) const;
 
+    friend ostringstream& operator<<(ostringstream&,const ZZn2&);
+    friend istringstream& operator>>(istringstream&, ZZn2&);
+    friend ostringstream& operator<<=(ostringstream& ,const ZZn2* );
+    friend istringstream& operator>>=(istringstream& , ZZn2*& );
+
     ~ZZn2()  
     {
     //    MR_ZERO_ZZN2  // slower but safer

@@ -54,6 +54,8 @@ the CertiVox MIRACL Crypto SDK with a closed source product.               *
 
 #include "zzn2.h"
 
+#include <sstream> 
+
 #ifdef ZZNS
 
 #ifndef MR_AFFINE_ONLY
@@ -184,6 +186,11 @@ public:
 #ifndef MR_NO_STANDARD_IO
     friend ostream& operator<<(ostream&,const ECn2&);
 #endif
+
+    friend ostringstream& operator<<(ostringstream&, const ECn2&  );
+    friend istringstream& operator>>(istringstream& , ECn2& );
+    friend ostringstream& operator<<=(ostringstream& ,const ECn2* );
+    friend istringstream& operator>>=(istringstream& , ECn2*& );
 
     ~ECn2() {
     //    MR_ZERO_ECN2  // slower but safer

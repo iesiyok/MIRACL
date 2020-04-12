@@ -331,7 +331,7 @@ istream& operator>>(istream& s, Big& x)
 
 //int window(const Big& x,int i,int *nbs,int *nzs,int window_size)
 //{ 
-	/* returns sliding window value, max. of 5 bits,         *
+  /* returns sliding window value, max. of 5 bits,         *
    * starting at i-th bit of big x. nbs is number of bits  *
    * processed, nzs is the number of additional trailing   *
    * zeros detected. Returns valid bit pattern 1x..x1 with *
@@ -344,7 +344,7 @@ istream& operator>>(istream& s, Big& x)
 
 //int naf_window(const Big& x,const Big& x3,int i,int *nbs,int *nzs,int store)
 //{ 
-	/* returns sliding window value, max of 5 bits           *
+  /* returns sliding window value, max of 5 bits           *
    * starting at i-th bit of x. nbs is number of bits      *
    * processed. nzs is number of additional trailing       *    
    * zeros detected. x and x3 (which is 3*x) are           *
@@ -429,7 +429,7 @@ ostream& otfloat(ostream& s,const Big& m,int e)
 
 #endif
 
-char* operator<<(char *s,const Big& x)
+char*& operator&&(char*& s,const Big& x)
 {
     miracl *mip=get_mip();
     int i,n;
@@ -450,3 +450,43 @@ void ecurve(const Big& a,const Big& b,const Big& p,int t)
 BOOL ecurve2(int m,int a,int b,int c,const Big& a2,const Big& a6,BOOL check,int t)
 { return ecurve2_init(m,a,b,c,a2.fn,a6.fn,check,t);}
 
+ostringstream& operator<<=(ostringstream& s, const Big& x)
+{
+    miracl *mip=get_mip();
+    #if defined(MR_SIMPLE_BASE) || defined(MR_SIMPLE_IO)
+        otstr(x.fn,mip->IOBUFF);
+    #else
+        cotstr(x.fn,mip->IOBUFF);
+    #endif
+        s << mip->IOBUFF; 
+        return s;
+
+}
+
+istringstream& operator>>=(istringstream& s, Big& x)
+{ 
+  miracl *mip=get_mip();
+   
+#ifndef MR_SIMPLE_BASE
+
+  if (mip->IOBASE>60) 
+  {
+     s.sync(); 
+     s.getline(mip->IOBUFF,mip->IOBSIZ);
+  }
+  else
+#endif
+    s >> mip->IOBUFF;
+  if (s.eof() || s.bad()) 
+  {   
+      zero(x.fn); 
+      return s; 
+  }
+#ifdef MR_SIMPLE_BASE
+  instr(x.fn,mip->IOBUFF); 
+#else
+  cinstr(x.fn,mip->IOBUFF); 
+#endif
+
+  return s;
+}
